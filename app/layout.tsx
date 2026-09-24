@@ -5,7 +5,7 @@ import { readEnv } from "@/db";
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, OG_IMAGE, SITE_NAME, siteUrl, websiteJsonLd } from "@/lib/seo";
 import "./globals.css";
 import "./globe.css";
-import { DataFastAnalytics } from "@/app/analytics";
+import { DataFastAnalytics, PostHogAnalytics } from "@/app/analytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -52,6 +52,9 @@ export default function RootLayout({
         {children}
         <SiteFooter />
         {readEnv("DATAFAST_WEBSITE_ID") && <DataFastAnalytics websiteId={readEnv("DATAFAST_WEBSITE_ID")!} />}
+        {readEnv("POSTHOG_KEY") && (
+          <PostHogAnalytics apiKey={readEnv("POSTHOG_KEY")!} host={readEnv("POSTHOG_HOST") || "https://us.i.posthog.com"} />
+        )}
         {readEnv("PLAUSIBLE_DOMAIN") && (
           <script defer data-domain={readEnv("PLAUSIBLE_DOMAIN")} src="https://plausible.io/js/script.js" />
         )}

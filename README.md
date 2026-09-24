@@ -68,6 +68,7 @@ Environment variables (see `.env.example`):
 | `RESEND_API_KEY`, `EMAIL_FROM` | Weekly emails (optional). |
 | `PLAUSIBLE_DOMAIN` | Cookie-free analytics (optional). |
 | `DATAFAST_WEBSITE_ID` | DataFast pageviews and product events (optional). |
+| `POSTHOG_KEY`, `POSTHOG_HOST` | PostHog pageviews and product events (optional). The project key starts with `phc_`; the host defaults to `https://us.i.posthog.com` (EU projects: `https://eu.i.posthog.com`). |
 
 Without a model key the importer falls back to a rules-based reader. Without X credentials, claiming and joining with X are disabled and the manual join form still works.
 
@@ -94,7 +95,7 @@ MIT. See `LICENSE`.
 
 ## Secrets and the database
 
-Secrets live only in `.env` (ignored by git) and, in production, in Cloudflare Worker secrets set with `wrangler secret put NAME`. A production build leaves every secret out of the generated Worker config; only non-secret settings (`MONGODB_DB`, `OPENROUTER_MODEL`, `EMAIL_FROM`, `SITE_URL`, `PLAUSIBLE_DOMAIN`, `DATAFAST_WEBSITE_ID`) are inlined. `readEnv` in `db/index.ts` reads the Cloudflare binding first and the process environment second.
+Secrets live only in `.env` (ignored by git) and, in production, in Cloudflare Worker secrets set with `wrangler secret put NAME`. A production build leaves every secret out of the generated Worker config; only non-secret settings (`MONGODB_DB`, `OPENROUTER_MODEL`, `EMAIL_FROM`, `SITE_URL`, `PLAUSIBLE_DOMAIN`, `DATAFAST_WEBSITE_ID`, `POSTHOG_KEY`, `POSTHOG_HOST`) are inlined. `readEnv` in `db/index.ts` reads the Cloudflare binding first and the process environment second.
 
 The repository ships with no data. The database holds people's private fields (emails, edit keys, claim tokens) and is never published. To move a database between environments use MongoDB's own tools:
 
