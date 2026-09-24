@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Check, LoaderCircle } from "lucide-react";
 import { normalizeMaker, type Maker } from "../profile";
+import { trackEvent } from "../analytics";
 
 type Status = "claimed" | "existing" | "created" | "needs-place" | "conflict";
 
@@ -19,6 +20,7 @@ export function JoinDone({ status, handle, name, avatarUrl }: { status: Status; 
       if (data.maker) {
         const mine = normalizeMaker(data.maker);
         setMaker(mine);
+        trackEvent("joined_with_x", { status, handle });
         try { localStorage.setItem("makersmap-own", JSON.stringify(mine)); } catch {}
       } else if (status === "needs-place") {
         // No pin yet: prefill the form with what X told us; the city is the one thing we couldn't read.

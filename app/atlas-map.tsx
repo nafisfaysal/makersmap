@@ -138,7 +138,6 @@ export default function AtlasMap(props: Props) {
   const clusters = useRef<Marker[]>([]);
   const relayout = useRef<() => void>(() => undefined);
   const latest = useRef(props);
-  const firstFocus = useRef(true);
   const firstView = useRef(true);
   const firstRegion = useRef(true);
   const hintRef = useRef<HTMLSpanElement>(null);
@@ -428,7 +427,6 @@ export default function AtlasMap(props: Props) {
 
   useEffect(() => {
     if (!ready || !props.selected) return;
-    if (firstFocus.current) { firstFocus.current = false; return; }
     const map = mapRef.current;
     if (!map) return;
     const zoom = Math.max(map.getZoom(), props.mapView === "globe" ? 4.5 : 6.4);
@@ -677,7 +675,7 @@ export default function AtlasMap(props: Props) {
       </div>
       <div className="globe-context">
         <span className="globe-overline">MEET THE MAKERS</span>
-        <h2>{props.region === "World" ? <>Hello,<br />world.</> : props.region === "Asia Pacific" ? <>Asia<br />Pacific.</> : <>{props.region}<span>.</span></>}</h2>
+        <h2 className={props.region === "Asia Pacific" ? "two-line" : undefined}>{props.region === "Asia Pacific" ? <>Asia<br />Pacific<span>.</span></> : <>{props.region}<span>.</span></>}</h2>
         <p>{props.people.length} {props.people.length === 1 ? "maker" : "makers"} · {countryCount} {countryCount === 1 ? "country" : "countries"}<br />{selectionMode === "country" ? "Click a country · zoom in for cities" : "Click to select a whole city"}</p>
       </div>
       <div className="globe-navigation">

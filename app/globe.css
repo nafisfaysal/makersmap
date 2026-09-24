@@ -27,6 +27,7 @@
 .globe-overline { letter-spacing:1.2px;color:#8caa74;font-family:ui-monospace,monospace;font-size:12px;font-weight:400;display:block }
 .globe-context h2 { letter-spacing:-2.8px;color:#ecf0dc;margin:15px 0 18px;font-size:54px;font-weight:400;line-height:1 }
 .globe-context h2>span { color:#bad86e }
+.globe-context h2.two-line { font-size:40px;letter-spacing:-2px }
 .globe-context p { color:#819d6c;font-size:13px;line-height:1.7 }
 .globe-coordinate { pointer-events:none;color:#8da375;z-index:2;align-items:flex-start;gap:8px;display:flex;position:absolute;top:100px;right:29px }
 .globe-coordinate>span { font-size:26px;line-height:1 }
@@ -131,4 +132,10 @@
 @media (prefers-reduced-motion:reduce) {
   .globe-loading svg { animation:none }
   .globe-pin-photo,.globe-pin-city { transition:none }
+}
+/* A short map (small laptop screens) has no room for the maker count under the heading: drop it so the heading never runs into the buttons. */
+@container (max-height:560px) {
+  .globe-context { top:84px }
+  .globe-context h2 { margin:10px 0 0 }
+  .globe-context p { display:none }
 }

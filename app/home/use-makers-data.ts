@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { normalizeMaker, normalizeProject, type Maker, type Project } from "../profile";
 import { useStoredState } from "../use-stored";
+import { trackEvent } from "../analytics";
 
 // Everything the home page knows about makers: the atlas dots, per-card details
 // fetched on demand, the project catalogue, and the visitor's own pin and saves.
@@ -70,7 +71,7 @@ export function useMakersData(wantCatalogue: boolean) {
 
   // The visitor's own pin sits first so they can always find themselves.
   const all = useMemo(() => (own ? [own, ...makers.filter((m) => m.id !== own.id && m.handle !== own.handle)] : makers), [own, makers]);
-  const toggleSave = useCallback((m: Maker) => setSaved((s) => (s.includes(m.id) ? s.filter((id) => id !== m.id) : [...s, m.id])), [setSaved]);
+  const toggleSave = useCallback((m: Maker) => setSaved((s) => { const saving = !s.includes(m.id); trackEvent(saving ? "maker_saved" : "maker_unsaved", { handle: m.handle }); return saving ? [...s, m.id] : s.filter((id) => id !== m.id); }), [setSaved]);
 
   return { makers, makersLoaded, all, own, setOwn, saved, toggleSave, full, ensureDetails, catalogue };
 }

@@ -13,6 +13,7 @@ import { ownerHeaders } from "./own-key";
 import { parseIds, useHydrated, useStoredState } from "./use-stored";
 import { formatRevenueDate, isCoffeeThisWeek, isOpenInPerson, isOpenToConnect, lookingForText, makerMrr, normalizeMaker, profileCompleteness, xHandleOf, xMessageUrl, type Maker, type Project } from "./profile";
 import { SocialIcon } from "./social-icon";
+import { trackEvent } from "./analytics";
 
 const SAVED_KEY = "makersmap-saved";
 const parseOwnRaw = (raw: string | null): string => raw || "";
@@ -47,6 +48,7 @@ export function ProfileActions({ maker }: { maker: Maker }) {
       const data = await response.json() as { pinned?: boolean; error?: string };
       if (!response.ok) { setPinError(data.error || "Couldn't change the pinned post."); return; }
       setPinned(Boolean(data.pinned));
+      trackEvent("post_pin_toggled", { handle: maker.handle, pinned: Boolean(data.pinned) });
       router.refresh();
     } catch { setPinError("Couldn't change the pinned post."); }
     finally { setSavingPin(false); }
@@ -64,7 +66,7 @@ export function ProfileActions({ maker }: { maker: Maker }) {
     } catch { return false; }
   })();
 
-  const signal = (kind: "save" | "message") => { if (maker.handle) fetch("/api/signal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle: maker.handle, kind }), keepalive: true }).catch(() => undefined); };
+  const signal = (kind: "save" | "message") => { trackEvent(kind === "message" ? "message_clicked" : "profile_saved_to_shelf", { handle: maker.handle }); if (maker.handle) fetch("/api/signal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle: maker.handle, kind }), keepalive: true }).catch(() => undefined); };
   const toggleSave = () => {
     if (!saved) signal("save");
     setSavedIds((list) => (list.includes(maker.id) ? list.filter((id) => id !== maker.id) : [...list, maker.id]));
@@ -107,6 +109,7 @@ export function ProfileActions({ maker }: { maker: Maker }) {
       const data = await response.json() as { maker?: Maker; error?: string };
       if (!response.ok || !data.maker) { setPinError(data.error || "Couldn't save that. Sign in with X if this is your pin."); return; }
       const saved = normalizeMaker(data.maker);
+      trackEvent("profile_updated", { handle: saved.handle });
       setCoffeeWeek(saved.coffeeWeek);
       try { localStorage.setItem(OWN_KEY, JSON.stringify(saved)); } catch {}
       router.refresh();

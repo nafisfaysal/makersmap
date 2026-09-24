@@ -23,6 +23,7 @@ import { PlacePeople } from "./home/place-people";
 import { ProjectsTab } from "./home/projects-tab";
 import { FiltersDialog } from "./home/filters-dialog";
 import { BrandMark } from "@/app/brand";
+import { trackEvent } from "@/app/analytics";
 
 const regionFor = (m: Maker): Region => (m.lon < -25 ? "Americas" : m.lon > 60 ? "Asia Pacific" : "Europe");
 const makerHref = (m: Maker) => (m.handle ? profilePath(m.handle) : "/");
@@ -42,7 +43,7 @@ export function HomeClient({ tab: initialTab = "explore" }: { tab?: string }) {
   // Map state
   const mapAnchor = useRef<HTMLDivElement>(null);
   const [mapView, setMapView] = useState("globe");
-  const [region, setRegion] = useState<Region>("Europe");
+  const [region, setRegion] = useState<Region>("World");
   const [focusRequest, setFocusRequest] = useState(0);
   const [regionRequest, setRegionRequest] = useState(0);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -50,7 +51,8 @@ export function HomeClient({ tab: initialTab = "explore" }: { tab?: string }) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const placed = useMemo(() => filtered.filter(isPlaced), [filtered]);
-  const selected = placed.find((m) => m.id === selectedId) || placed[0];
+  // Nobody is highlighted until someone picks a maker on the map, a card, or "Surprise me".
+  const selected = selectedId == null ? undefined : placed.find((m) => m.id === selectedId);
 
   const select = useCallback((m: Maker) => { setSelectedId(m.id); setFocusRequest((n) => n + 1); setRegion(regionFor(m)); }, []);
   const selectFromShelf = (m: Maker) => { noteSeen(m); select(m); mapAnchor.current?.scrollIntoView({ block: "center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }); };
@@ -62,6 +64,7 @@ export function HomeClient({ tab: initialTab = "explore" }: { tab?: string }) {
   const applyAsk = (outcome: AskOutcome) => {
     clearFilters();
     setAsked(outcome);
+    trackEvent("ask_atlas", { query: outcome.query.slice(0, 120), results: outcome.results.length, source: outcome.source });
     setTab("explore");
     const first = all.find((m) => m.handle === outcome.results[0]?.handle);
     if (first) select(first);
@@ -159,6 +162,7 @@ export function HomeClient({ tab: initialTab = "explore" }: { tab?: string }) {
         // not a navigation. That keeps it instant and avoids the router aborting an in-flight request.
         const href = value === "projects" ? "/projects" : "/";
         setTab(value);
+        trackEvent("tab_opened", { tab: value });
         if (pathname !== href) window.history.pushState(null, "", href);
         document.title = value === "projects" ? "Projects · MakersMap" : "MakersMap — A world of good company";
       }}>
@@ -216,7 +220,7 @@ export function HomeClient({ tab: initialTab = "explore" }: { tab?: string }) {
                   onSurprise={surprise}
                   focusRequest={focusRequest}
                   regionRequest={regionRequest}
-                  onPlace={setPlaceSelection}
+                  onPlace={(s) => { setPlaceSelection(s); if (s) trackEvent("place_selected", { place: s.name, kind: s.kind, makers: s.makers.length }); }}
                 />
               </div>
 
@@ -229,7 +233,7 @@ export function HomeClient({ tab: initialTab = "explore" }: { tab?: string }) {
                 </div>
                 <div className="maker-shelf" ref={grid}>
                   {shelf.map(full).map((m) => (
-                    <MakerCard key={m.id} maker={m} selected={selected?.id === m.id} isOwn={Boolean(own && m.id === own.id)} saved={saved.includes(m.id)} reason={askReason(m)} onSelect={selectFromShelf} onToggleSave={toggleSave} onOpen={noteSeen} />
+                    <MakerCard key={m.id} maker={m} selected={selected?.id === m.id} isOwn={Boolean(own && m.id === own.id)} saved={saved.includes(m.id)} reason={askReason(m)} onSelect={selectFromShelf} onToggleSave={toggleSave} onOpen={(m) => { noteSeen(m); trackEvent("profile_opened", { handle: m.handle, from: "cards" }); }} />
                   ))}
                 </div>
                 {ranked.length > shelf.length && (

@@ -5,6 +5,7 @@ import { isOpenInPerson, roleGroupOf, type Maker } from "../profile";
 import { rankShelf } from "../shelf";
 import { useStoredState } from "../use-stored";
 import type { AskOutcome } from "../ask-atlas";
+import { trackEvent } from "../analytics";
 
 // The filters on the atlas and the ranked, windowed "Meet someone interesting"
 // list they produce. Ask results keep the model's order; otherwise people are
@@ -23,7 +24,7 @@ export function useShelf(all: Maker[], saved: number[], own: Maker | null) {
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [asked, setAsked] = useState<AskOutcome | null>(null);
   const [seen, setSeen] = useStoredState<string[]>("makersmap-seen", parseSeen);
-  const patch = useCallback((change: Partial<Filters>) => setFilters((f) => ({ ...f, ...change })), []);
+  const patch = useCallback((change: Partial<Filters>) => { trackEvent("filter_changed", { keys: Object.keys(change).join(",") }); setFilters((f) => ({ ...f, ...change })); }, []);
   const clearFilters = useCallback(() => { setFilters(defaultFilters); setAsked(null); }, []);
 
   const askedHandles = useMemo(() => (asked ? new Set(asked.results.map((r) => r.handle)) : null), [asked]);

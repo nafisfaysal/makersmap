@@ -5,6 +5,7 @@ import { useHydrated } from "../use-stored";
 import { Check, Copy, Download, LoaderCircle, Orbit } from "lucide-react";
 import { toPng } from "html-to-image";
 import { SocialIcon } from "../social-icon";
+import { trackEvent } from "../analytics";
 
 export type Face = { avatar: string; initials: string; color: string; name: string };
 export type ShareData = {
@@ -41,12 +42,13 @@ export function ShareClient({ data }: { data: ShareData }) {
       link.download = `${data.fileName}.png`;
       link.href = dataUrl;
       link.click();
+      trackEvent("share_card_downloaded", { card: data.fileName });
     } catch {
       setError("Couldn't render the image here. Try a different browser, or screenshot the card.");
     } finally { setBusy(false); }
   };
   const copyPost = async () => {
-    try { await navigator.clipboard.writeText(postText); setCopied(true); window.setTimeout(() => setCopied(false), 2000); } catch {}
+    try { await navigator.clipboard.writeText(postText); trackEvent("share_post_copied", { card: data.fileName }); setCopied(true); window.setTimeout(() => setCopied(false), 2000); } catch {}
   };
 
   return (

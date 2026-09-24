@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowUpRight, Check, LoaderCircle, ShieldCheck } from "lucide-react";
 import { SocialIcon } from "../social-icon";
 import { profilePath } from "../handle";
+import { trackEvent } from "../analytics";
 
 type Pin = {
   name: string; handle: string; city: string; country: string; flag: string; role: string;
@@ -28,6 +29,7 @@ export function ClaimClient({ handle, configured, error, session, pin }: {
       const data = await response.json() as { maker?: unknown; error?: string };
       if (!response.ok || !data.maker) { setProblem(data.error || "Could not claim the pin."); return; }
       try { localStorage.setItem("makersmap-own", JSON.stringify(data.maker)); } catch {}
+      trackEvent("pin_claimed", { handle, withEmail: Boolean(email.trim()) });
       setDone(true);
     } catch {
       setProblem("Could not reach the server.");
