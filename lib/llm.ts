@@ -19,7 +19,7 @@ export function llmModel(): string {
   return readEnv("OPENROUTER_MODEL") || "anthropic/claude-sonnet-5";
 }
 
-type Ask<T extends z.ZodTypeAny> = { system: string; user: string; schema: T; maxTokens?: number; label?: string };
+type Ask<T extends z.ZodTypeAny> = { system: string; user: string; schema: T; maxTokens?: number; label?: string; timeoutMs?: number; retries?: number };
 
 function stripFences(text: string): string {
   const trimmed = text.trim();
@@ -38,7 +38,7 @@ async function viaOpenRouter<T extends z.ZodTypeAny>(ask: Ask<T>, attempt = 0): 
   try {
     response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
-    signal: AbortSignal.timeout(75_000),
+    signal: AbortSignal.timeout(ask.timeoutMs ?? 75_000),
     headers: {
       Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
@@ -58,13 +58,13 @@ async function viaOpenRouter<T extends z.ZodTypeAny>(ask: Ask<T>, attempt = 0): 
   });
   } catch (error) {
     console.error(`OpenRouter ${ask.label || ""}: request failed (${error instanceof Error ? error.name : "error"})`);
-    if (attempt < 2) return viaOpenRouter(ask, attempt + 1);
+    if (attempt < (ask.retries ?? 2)) return viaOpenRouter(ask, attempt + 1);
     return null;
   }
   const data = await response.json().catch(() => ({})) as { choices?: { message?: { content?: string } }[]; error?: { message?: string } };
   if (!response.ok) {
     console.error(`OpenRouter ${ask.label || ""}: ${response.status} ${data.error?.message || ""}`);
-    if ((response.status === 429 || response.status >= 500) && attempt < 2) {
+    if ((response.status === 429 || response.status >= 500) && attempt < (ask.retries ?? 2)) {
       await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
       return viaOpenRouter(ask, attempt + 1);
     }
@@ -78,7 +78,7 @@ async function viaOpenRouter<T extends z.ZodTypeAny>(ask: Ask<T>, attempt = 0): 
   } catch {
     console.error(`OpenRouter ${ask.label || ""}: answer wasn't JSON:`, content.slice(0, 200).replace(/\s+/g, " "), data.choices?.[0] ? "" : JSON.stringify(data).slice(0, 200));
   }
-  if (attempt < 1) return viaOpenRouter(ask, attempt + 1);
+  if (attempt < Math.min(1, ask.retries ?? 1)) return viaOpenRouter(ask, attempt + 1);
   return null;
 }
 

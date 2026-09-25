@@ -106,7 +106,7 @@ export function ClaimClient({ handle, configured, error, session, pin }: {
       )}
 
       {pin && !pin.claimed && pin.listedFromX && (
-        <p className="claim-remove">Don&apos;t want to be on the map? <Link href={`/remove?handle=${encodeURIComponent(pin.handle)}`}>Remove this pin</Link>. No sign-in needed.</p>
+        <p className="claim-remove">Don&apos;t want to be on the map? <Link href={`/remove?handle=${encodeURIComponent(pin.handle)}`}>Remove this pin</Link> by signing in with the same X account.</p>
       )}
     </div>
   );

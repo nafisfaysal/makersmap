@@ -4184,6 +4184,56 @@ a.maker-identity {
   display: grid;
   gap: 10px;
   margin: 4px 0 18px;
+  position: relative;
+}
+
+.ask-suggest {
+  position: absolute;
+  top: 58px;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #d9e3c2;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px #1d2a2024;
+  max-width: 560px;
+}
+
+.ask-suggest button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ask-suggest button.active,
+.ask-suggest button:hover {
+  background: #f2f6e6;
+}
+
+.ask-suggest strong {
+  display: block;
+  font-size: 14px;
+  color: #1d2a20;
+}
+
+.ask-suggest small {
+  display: block;
+  font-size: 12px;
+  color: #6f7c64;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ask-form {

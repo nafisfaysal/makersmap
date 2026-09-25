@@ -1,14 +1,15 @@
 import { z } from "zod";
 import { listPublicMakers } from "@/app/makers-lookup";
-import { askAtlas } from "@/lib/ask";
+import { askAtlas, directAsk, rulesAsk } from "@/lib/ask";
 
-const input = z.object({ query: z.string().trim().min(2).max(300) });
+const input = z.object({ query: z.string().trim().min(2).max(300), fast: z.boolean().optional() });
 
 export async function POST(request: Request) {
   try {
-    const { query } = input.parse(await request.json());
+    const { query, fast } = input.parse(await request.json());
     const pool = await listPublicMakers();
-    const answer = await askAtlas(query, pool);
+    // "fast" answers from keywords in milliseconds; the page shows it while the model ranks.
+    const answer = fast ? (directAsk(query, pool) ?? rulesAsk(query, pool)) : await askAtlas(query, pool);
     const byHandle = new Map(pool.map((m) => [m.handle, m]));
     return Response.json({
       ...answer,

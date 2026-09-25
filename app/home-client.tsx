@@ -190,7 +190,7 @@ export function HomeClient({ tab: initialTab = "explore" }: { tab?: string }) {
                 </div>
               </div>
 
-              <AskAtlas onResult={applyAsk} onClear={() => setAsked(null)} active={asked} />
+              <AskAtlas onResult={applyAsk} onClear={() => setAsked(null)} active={asked} people={all} onPick={(m) => { trackEvent("quick_find", { handle: m.handle }); if (isPlaced(m)) selectFromShelf(m); else if (m.handle) router.push(makerHref(m)); }} />
 
               <div className="atlas-filters">
                 <ToggleGroup type="single" value={filters.role} onValueChange={(role) => { if (role) patch({ role }); }} className="role-filters" aria-label="Filter by role">
