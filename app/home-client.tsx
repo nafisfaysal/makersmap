@@ -23,6 +23,7 @@ import { PlacePeople } from "./home/place-people";
 import { ProjectsTab } from "./home/projects-tab";
 import { FiltersDialog } from "./home/filters-dialog";
 import { BrandMark } from "@/app/brand";
+import { GithubStarButton } from "./github-star";
 import { trackEvent } from "@/app/analytics";
 
 const regionFor = (m: Maker): Region => (m.lon < -25 ? "Americas" : m.lon > 60 ? "Asia Pacific" : "Europe");
@@ -175,6 +176,7 @@ export function HomeClient({ tab: initialTab = "explore" }: { tab?: string }) {
             <TabsTrigger value="projects"><Box size={16} />Projects</TabsTrigger>
           </TabsList>
           <Link className="header-link" href="/leaderboard" aria-label="Leaderboard"><Trophy size={16} /><span>Leaderboard</span></Link>
+          <GithubStarButton />
           <Button className="primary add-button" aria-label={own ? "Edit your pin" : "Find your place"} onClick={() => { if (own) setAddOpen(true); else router.push("/join"); }}>
             <span>{own ? "Edit your pin" : "Find your place"}</span><Plus size={18} />
           </Button>
