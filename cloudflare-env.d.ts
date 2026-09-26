@@ -17,6 +17,7 @@ declare namespace Cloudflare {
     PLAUSIBLE_DOMAIN?: string;
     DATAFAST_WEBSITE_ID?: string;
     POSTHOG_KEY?: string;
+    X_REQUEST_EMAIL?: string;
     POSTHOG_HOST?: string;
     BUCKET?: R2Bucket;
   }

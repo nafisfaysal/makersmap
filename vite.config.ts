@@ -106,6 +106,7 @@ const localBindingConfig = {
     PLAUSIBLE_DOMAIN: process.env.PLAUSIBLE_DOMAIN || "",
     DATAFAST_WEBSITE_ID: process.env.DATAFAST_WEBSITE_ID || "",
     POSTHOG_KEY: process.env.POSTHOG_KEY || "",
+    X_REQUEST_EMAIL: process.env.X_REQUEST_EMAIL || "",
     POSTHOG_HOST: process.env.POSTHOG_HOST || "",
     ...(process.env.NODE_ENV === "production" && !process.env.INLINE_SECRETS ? {} : {
       MONGODB_URI: process.env.MONGODB_URI || "",

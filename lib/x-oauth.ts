@@ -1,9 +1,13 @@
 import { readEnv } from "@/db";
 import { fullSizeAvatar, type XUser } from "./x-api";
 
-// X OAuth 2.0 with PKCE. Scopes: who is signing in, plus their confirmed email
-// (needs "Request email from users" turned on in the X developer console).
-const SCOPES = "tweet.read users.read users.email";
+// X OAuth 2.0 with PKCE. Scopes: who is signing in, plus (opt-in) their confirmed email.
+// users.email only works once "Request email from users" is on in the X developer console,
+// which needs a privacy policy and terms URL. Asking for it before that makes X refuse the
+// whole sign-in ("You weren't able to give access to the App"), so it is off unless
+// X_REQUEST_EMAIL=true.
+const BASE_SCOPES = "tweet.read users.read";
+const signInScopes = () => (readEnv("X_REQUEST_EMAIL") === "true" ? `${BASE_SCOPES} users.email` : BASE_SCOPES);
 // The operator account also needs to write replies and keep a refresh token.
 export const OPERATOR_SCOPES = "tweet.read tweet.write users.read offline.access";
 
@@ -33,7 +37,7 @@ export function authorizeUrl(params: { redirectUri: string; state: string; chall
   url.searchParams.set("response_type", "code");
   url.searchParams.set("client_id", readEnv("X_CLIENT_ID") || "");
   url.searchParams.set("redirect_uri", params.redirectUri);
-  url.searchParams.set("scope", params.scopes || SCOPES);
+  url.searchParams.set("scope", params.scopes || signInScopes());
   url.searchParams.set("state", params.state);
   url.searchParams.set("code_challenge", params.challenge);
   url.searchParams.set("code_challenge_method", "S256");

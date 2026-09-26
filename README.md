@@ -64,6 +64,7 @@ Environment variables (see `.env.example`):
 | `ADMIN_SECRET` | The admin console at `/admin` and the daily job. |
 | `SESSION_SECRET` | Signing the login cookie. |
 | `X_CLIENT_ID`, `X_CLIENT_SECRET` | Sign in with X (OAuth 2.0 web app; callback `<SITE_URL>/api/auth/x/callback`). |
+| `X_REQUEST_EMAIL` | `true` to also collect the signer's email. Turn on "Request email from users" in the X app first, or X refuses the sign-in. |
 | `SITE_URL` | The public origin, for OAuth callbacks and links. |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Weekly emails (optional). |
 | `PLAUSIBLE_DOMAIN` | Cookie-free analytics (optional). |

@@ -672,6 +672,14 @@ export default function AtlasMap(props: Props) {
           <SelectTrigger className="globe-region" aria-label="Map region"><Globe2 size={15} /><SelectValue /></SelectTrigger>
           <SelectContent>{(Object.keys(regions) as Region[]).map((r) => <SelectItem key={r} value={r}>{r === "World" ? "Whole world" : r}</SelectItem>)}</SelectContent>
         </Select>
+        {props.people.length > 0 && (
+          <div className="globe-count" aria-label={`${props.people.length} makers in ${countryCount} countries on the map`}>
+            <span className="globe-count-dot" aria-hidden="true" />
+            <strong>{props.people.length.toLocaleString("en-US")}</strong><span>makers</span>
+            <i aria-hidden="true" />
+            <strong>{countryCount}</strong><span>countries</span>
+          </div>
+        )}
       </div>
       <div className="globe-context">
         <span className="globe-overline">MEET THE MAKERS</span>

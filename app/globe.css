@@ -20,7 +20,7 @@
 .globe-fallback h2 { letter-spacing:-.6px;color:#e7efce;font-size:22px;font-weight:500 }
 .globe-fallback p { color:#a5bc87;font-size:14px;line-height:1.7 }
 .globe-fallback button { color:#21381f;background:#d4ee76;border:0;gap:12px;font-size:14px }
-.globe-toolbar { z-index:25;align-items:center;display:flex;position:absolute;top:22px;left:25px }
+.globe-toolbar { z-index:25;align-items:center;gap:10px;display:flex;position:absolute;top:22px;left:25px }
 .globe-region[data-slot=select-trigger] { color:#bdd29d;width:auto;min-width:141px;height:40px;box-shadow:none;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);background:#193124a8;border:1px solid #8eaa6550;border-radius:30px;gap:9px;padding:0 14px;font-size:14px }
 .globe-region[data-slot=select-trigger]>svg { color:#a1ba80 }
 .globe-context { z-index:2;pointer-events:none;max-width:240px;position:absolute;top:100px;left:29px }
@@ -139,3 +139,12 @@
   .globe-context h2 { margin:10px 0 0 }
   .globe-context p { display:none }
 }
+/* Live maker count next to the region picker: always visible, whatever the map height. */
+.globe-count { display:flex;align-items:center;gap:5px;height:40px;padding:0 15px 0 13px;border-radius:30px;background:#193124a8;border:1px solid #8eaa6550;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#a9c08a;font-size:13.5px;white-space:nowrap;pointer-events:none }
+.globe-count strong { color:#eef6d6;font-weight:600;font-variant-numeric:tabular-nums }
+.globe-count i { width:3px;height:3px;border-radius:50%;background:#6f8a58;margin:0 5px }
+.globe-count-dot { position:relative;width:8px;height:8px;margin-right:4px;border-radius:50%;background:#d4ee76;box-shadow:0 0 10px #d4ee76 }
+.globe-count-dot::after { content:"";position:absolute;inset:-4px;border-radius:50%;border:1.5px solid #d4ee76;opacity:0;animation:count-pulse 2.4s ease-out infinite }
+@keyframes count-pulse { 0% { transform:scale(.6);opacity:.8 } 100% { transform:scale(1.8);opacity:0 } }
+@media (max-width:600px) { .globe-toolbar { flex-direction:column;align-items:flex-start;gap:8px } .globe-count { height:32px;padding:0 11px;font-size:12.5px } .globe-count i, .globe-count i ~ * { display:none } }
+@media (prefers-reduced-motion:reduce) { .globe-count-dot::after { animation:none } }
