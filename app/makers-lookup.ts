@@ -4,11 +4,19 @@ import { findMakerByHandle, listMakers, listPublicWhere } from "@/db/makers";
 import { cache } from "react";
 import { publicMaker, type Maker } from "@/app/profile";
 
+// The public list is derived once per shared listMakers() result instead of per
+// request. A per-request copy (~2 MB at 10k makers) was retained after every
+// render, so a crawler walking the profiles ran a self-hosted isolate out of
+// heap. Callers only read it (filter/find/map), never change it.
+let derived: { from: Maker[]; list: Maker[] } | null = null;
+
 // Wrapped in React's cache so a page that needs the list in metadata and body reads it once.
 export const listPublicMakers = cache(async function listPublicMakers(): Promise<Maker[]> {
   if (isMongoConfigured()) {
     try {
-      return (await listMakers()).filter((maker) => !maker.hidden).map(publicMaker);
+      const all = await listMakers();
+      if (derived?.from !== all) derived = { from: all, list: all.filter((maker) => !maker.hidden).map(publicMaker) };
+      return derived.list;
     } catch {
       // Unreachable database: an empty atlas rather than a crash.
     }
